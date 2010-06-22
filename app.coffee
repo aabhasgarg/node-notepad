@@ -20,7 +20,7 @@ configure( ->
 
 get('/', ->
   self: this
-  noteProvider.save([{content: ''}], (error, note)->
+  noteProvider.save([{content: '', author: ''}], (error, note)->
     sys.puts("Error: "+error) if error != null
     note_id: note._id.toHexString() if note != undefined
     self.redirect('/note/'+note_id)
@@ -37,7 +37,7 @@ get('/js/*', (file) ->
   this.sendfile(__dirname + '/public/js/' + file))
 
 get('/css/*', (file) ->
-  this.sendfile(__dirname + '/public/js/' + file))
+  this.sendfile(__dirname + '/public/css/' + file))
 
 run()
 
@@ -46,21 +46,21 @@ run()
 wsserver: ws.createServer((socket) ->
   socket.addListener('connect', (resource) ->
     sys.puts('client connected from' + resource)
-    socket.write('{welcome}')
   )
 
-  socket.addListener('data', (data) ->
-    socket.write(data)
-    parsed_data: {id: data.split(':')[0], content: data.split(':')[1]}
+  socket.addListener('data', (raw_data) ->
+    socket.write(raw_data)
+    data: raw_data.split(':')
+    parsed_data: {author: data[0], id: data[1], content: data[2]}
     noteProvider.findById(parsed_data.id, (error, note) ->
       sys.puts('Error: '+error) if error != null
       noteProvider.getCollection( (error, collection)->
         noteProvider.findById(parsed_data.id, (error, note)->
-          collection.update(note, {content: parsed_data.content})
+          collection.update(note, {content: parsed_data.content, author: parsed_data.author})
         )
       )
     )
-    sys.puts(data)
+    sys.puts(raw_data)
   )
 
   socket.addListener('close', (data) ->

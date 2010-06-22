@@ -1,4 +1,9 @@
 #input
-  %textarea{id: note._id.toHexString()}
+  Author: 
+  %input{id: 'author', type: 'text', value: note.author}
+  %br
+  #info-area
+  %br
+  %textarea{id: note._id.toHexString(), readonly: 'readonly'}
     =note.content
 #output

@@ -1,0 +1,10 @@
+body{
+  text-align: center;
+}
+
+textarea {
+  height: 500px;
+  width: 500px;
+  background-color: #AAA;
+  opacity: 0.4;
+}
